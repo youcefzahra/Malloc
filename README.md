@@ -24,13 +24,27 @@ Unlike basic implementations, this allocator avoids calling `mmap` for every sma
 
 The library is designed to be "preloaded" into existing binaries (like `ls`, `cat`, or even `vlc`), effectively replacing the standard libc allocator at runtime.
 
+### 🔍 Symbol Export Verification
+
+To ensure the library remains lightweight and strictly follows the required API, only the four mandatory symbols are exported. This can be verified with:
+```bash
+nm -C -D libmalloc.so
+```
+
+* **Global Symbols (T):** Only `malloc`, `free`, `calloc`, and `realloc` appear as public symbols.
+* **Hidden Implementation:** No internal auxiliary functions are exposed, proving clean encapsulation and proper use of visibility flags.
+
 ## 🎯 Testing the Allocator
 
 A pre-compiled shared library is available in the **Releases** section.
 
-1. Download the `malloc_demo.tar.gz` archive.
-2. Use `LD_PRELOAD` to run any command with your custom allocator:
+1. Download and extract the `malloc_demo.tar.gz` archive:
 ```bash
-# Example: Running 'ls' with your custom malloc
+tar -xvf malloc_demo.tar.gz
+cd malloc_demo
+```
+
+2. Use `LD_PRELOAD` to run any command with the custom allocator:
+```bash
 LD_PRELOAD=./libmalloc.so ls -la
 ```
